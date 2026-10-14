@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Git Studio (dsh-git-studio)",
+    "description": "Git 面板：仓库状态、暂存/提交/推送、分支/日志/差异与文件浏览，独立浮窗形态。"
+  }
+}

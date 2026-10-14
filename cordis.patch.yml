@@ -1,0 +1,4 @@
+# dsh-git-studio bundle patch
+- insert:
+    - id: dsh-git-studio
+      name: 'dsh-git-studio'

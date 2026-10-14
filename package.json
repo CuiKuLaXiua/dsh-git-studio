@@ -1,0 +1,73 @@
+{
+  "name": "dsh-git-studio",
+  "version": "0.1.0",
+  "description": "Git Studio — Git 面板：仓库状态、暂存/提交/推送、分支/日志/差异与文件浏览，独立浮窗形态",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "author": "dsh-git-studio contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CuiKuLaXiua/dsh-git-studio.git"
+  },
+  "homepage": "https://github.com/CuiKuLaXiua/dsh-git-studio#readme",
+  "bugs": {
+    "url": "https://github.com/CuiKuLaXiua/dsh-git-studio/issues"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "slots"
+      ],
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "smoke": "node smoke.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "@deepseek-ai/dsh-client-ui-primitives": ">=0.1.0-rc.6 <0.3.0-0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-client-ui-primitives": {
+      "optional": true
+    }
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "locale",
+    "README.md",
+    "icon.svg"
+  ],
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "git",
+    "panel",
+    "workbench",
+    "studio"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Git Studio (dsh-git-studio)",
+    "description": "Git panel: status, stage/commit/push, branches, log, diff and file browsing in an independent floating window."
+  }
+}
