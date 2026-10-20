@@ -1,6 +1,6 @@
 {
   "name": "dsh-git-studio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Git Studio — Git 面板：仓库状态、暂存/提交/推送、分支/日志/差异与文件浏览，独立浮窗形态",
   "license": "MIT",
   "type": "module",

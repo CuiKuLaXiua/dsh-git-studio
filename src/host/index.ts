@@ -16,11 +16,27 @@ import { GIT_METHODS } from "./git-api";
 
 export { GIT_METHODS, parseStatusZ, parseLogLines } from "./git-api";
 
-// webRuntime 保留：它承载 web 启动选项（`trustedHosts` 即来自 dsh-web-app 启动
-// 时的 options.trustedHost），信任围栏据此放行额外主机。
-// ⚠ 不可因"看起来没用到"就摘掉 —— cordis 对**未注入属性**的读取是直接抛错的
-// （`cannot get property "webRuntime" without inject`），apply 里一解构即启动失败。
-export const inject = ["webServer", "sessions", "webRuntime"];
+// web 启动选项（`trustedHosts` 即来自启动参数 --trusted-host）承载在哪个服务上，
+// 两个版本不一样：0.1.x 叫 `webRuntime`，0.2.1 起改名为 `webStartup`。
+// ⚠ 名字绝不能写进静态 inject —— cordis 的静态 inject 是硬依赖，任一服务缺失就把
+// 整个宿主半端置为 INACTIVE、apply 永不执行。DSH 0.2.1-rc.2 移除 webRuntime 后，
+// 旧写法（inject 含 webRuntime）导致本插件路由未注册，POST 直落前端静态兜底 → HTTP
+// 405（面板报错）。故只把真正必需的两个服务写进 inject，启动选项用 ctx.get 可选读取
+// （缺服务返回 undefined，且不产生 inject 要求）。
+export const inject = ["webServer", "sessions"];
+
+/** 读取启动选项载体服务：0.2.1+ 的 webStartup，回退 0.1.x 的 webRuntime。 */
+function readWebStartup(ctx: any): any {
+  for (const name of ["webStartup", "webRuntime"]) {
+    try {
+      const svc = ctx.get?.(name);
+      if (svc) return svc;
+    } catch {
+      /* 服务未提供：读下一个名字 */
+    }
+  }
+  return undefined;
+}
 
 const MAX_BODY = 1024 * 1024; // 1MB（对齐生态 readJsonBody 上限）
 
@@ -83,7 +99,9 @@ function wireErrorOf(e: any): { status: number; code: string; message: string } 
 }
 
 export function apply(ctx: any): void {
-  const { webServer, webRuntime, logger } = ctx;
+  const { webServer, logger } = ctx;
+  // 启动选项：新版 webStartup / 旧版 webRuntime，缺失时按"无额外信任主机"处理
+  const webStartup = readWebStartup(ctx);
 
   // 业务错误 → 信封响应；不认识的记日志后 500
   function failScope(res: any, e: any, scope: string): void {
@@ -101,7 +119,7 @@ export function apply(ctx: any): void {
     path: API_PREFIX,
     handler: async (req: any, res: any) => {
       // 信任围栏：Host 回环/信任列表 + sec-fetch-site + Origin hostname（Edge 151 兼容）
-      if (!isTrustedApiRequest(req, webRuntime?.trustedHosts)) {
+      if (!isTrustedApiRequest(req, webStartup?.trustedHosts)) {
         sendJson(res, 403, fail(ErrorCode.Forbidden, "untrusted request"));
         return;
       }
